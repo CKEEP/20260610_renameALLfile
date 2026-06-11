@@ -92,7 +92,7 @@ if __name__ == "__main__":
     print("  文件批量重命名（按修改日期时间）")
     print("=" * 50)
 
-    # 检测检测是否存在撤回记录
+    # 检测检测检测是否存在撤回记录
     has_log = os.path.exists(LOG_FILE)
 
     if has_log:
