@@ -3,12 +3,11 @@ import json
 from datetime import datetime
 
 SCRIPT_NAME = os.path.basename(__file__)
-folder = os.path.dirname(os.path.abspath(__file__))
-LOG_FILE = os.path.join(folder, ".rename_log.json")
 
 
-def do_rename():
+def do_rename(folder):
     """将文件夹内所有文件重命名为修改日期时间"""
+    LOG_FILE = os.path.join(folder, ".rename_log.json")
     log = {}  # new_name -> old_name
 
     for filename in os.listdir(folder):
@@ -44,8 +43,9 @@ def do_rename():
         print("没有需要重命名的文件。")
 
 
-def do_undo():
+def do_undo(folder):
     """根据日志文件撤回所有重命名操作"""
+    LOG_FILE = os.path.join(folder, ".rename_log.json")
     if not os.path.exists(LOG_FILE):
         print("没有找到重命名记录，无法撤回。")
         return
@@ -92,7 +92,17 @@ if __name__ == "__main__":
     print("  文件批量重命名（按修改日期时间）")
     print("=" * 50)
 
-    # 检测检测检测是否存在撤回记录
+    default_folder = os.path.dirname(os.path.abspath(__file__))
+    folder_input = input(f"\n请输入目标文件夹路径（直接回车使用默认路径 {default_folder}）: ").strip()
+    folder = folder_input if folder_input else default_folder
+
+    if not os.path.isdir(folder):
+        print(f"路径不存在或不是文件夹: {folder}")
+        exit(1)
+
+    LOG_FILE = os.path.join(folder, ".rename_log.json")
+
+    # 检测是否存在撤回记录
     has_log = os.path.exists(LOG_FILE)
 
     if has_log:
@@ -101,15 +111,15 @@ if __name__ == "__main__":
         print("  [2] 撤回上次重命名")
         choice = input("\n请选择 (1/2): ").strip()
         if choice == "2":
-            do_undo()
+            do_undo(folder)
         else:
             # 删除旧日志，重新开始
             os.remove(LOG_FILE)
-            do_rename()
+            do_rename(folder)
     else:
         print(f"\n目标文件夹: {folder}")
         confirm = input("确认重命名所有文件？(y/n): ").strip().lower()
         if confirm == "y":
-            do_rename()
+            do_rename(folder)
         else:
             print("已取消。")
